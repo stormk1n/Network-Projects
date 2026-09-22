@@ -1,0 +1,58 @@
+R2# configure terminal
+R2(config)# aaa new-model
+R2(config)# aaa authentication login default local
+R2(config)# aaa authorization network default local
+R2(config)# username RemoteUsers secret ClientP@ss123
+R2(config)#
+R2(config)# crypto isakmp policy 10
+R2(config-isakmp)# encr aes 256
+R2(config-isakmp)# hash sha256
+R2(config-isakmp)# authentication pre-share
+R2(config-isakmp)# group 14
+R2(config-isakmp)# lifetime 86400
+R2(config-isakmp)# exit
+R2(config)#
+R2(config)# crypto isakmp identity address
+R2(config)# crypto isakmp aggressive !! Enabled by default so no need to use
+R2(config)# exit
+R2(config)#
+R2(config)# crypto ipsec transform-set TS_CLIENT esp-aes esp-sha256-hmac
+R2(config-crypto-ts)# mode tunnel
+R2(config-crypto-ts)# exit
+R2(config)#
+R2(config)# ip local pool ClientVpnPool 192.168.30.10 192.168.30.50
+R2(config)# ip access-list extended ClientVpn_Acc
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.35.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.45.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.40.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.50.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.55.0 0.0.0.255
+R2(config)# exit
+R2(config)#
+R2(config)# crypto isakmp profile CLIENT_PROFILE
+R2(config-isakmp-profile)# authentication pre-share
+R2(config-isakmp-profile)# group 14
+R2(config-isakmp-profile)# lifetime 86400
+R2(config-isakmp-profile)# client configuration address respond
+R2(config-isakmp-profile)# virtual-template 2
+R2(config-isakmp-profile)# exit
+
+R2(config)# interface Virtual-Template 2 type tunnel
+R2(config-if)# ip unnumbered GigabitEthernet0/2
+R2(config-if)# tunnel mode ipsec ipv4
+R2(config-if)# tunnel protection ipsec profile CLIENT_PROFILE
+R2(config-if)# exit
+
+R2(config)# crypto map CM_CLIENT 1 ipsec-isakmp dynamic CLIENT_PROFILE
+R2(config)# interface GigabitEthernet0/2
+R2(config-if)# crypto map CM_CLIENT
+R2(config-if)# exit
+
+R2(config)#ip access-list extended ClientVpn_NAT
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+R2(config)# ip nat inside source list ClientVpn_NAT interface GigabitEthernet0/2 overload
+
+https://www.youtube.com/watch?v=I6tbLOJTqTQ

@@ -1,0 +1,55 @@
+R2(config)#!! CLIENT VPN – IKEv2
+R2(config)#ip local pool ClientVpn_Pool 192.168.30.10 192.168.30.50   ! VPN client IPs
+
+R2(config)#crypto ikev2 keyring CLIENT_KEY
+R2(config-ikev2-keyring)#peer ANY
+R2(config-ikev2-keyring-peer)#address 0.0.0.0
+R2(config-ikev2-keyring-peer)#pre-shared-key vpnpass123
+R2(config-ikev2-keyring-peer)#exit
+R2(config-ikev2-keyring)#exit
+
+R2(config)#crypto ikev2 policy CLIENT_POLICY
+R2(config-ikev2-policy)#encryption aes-256
+R2(config-ikev2-policy)#integrity sha256
+R2(config-ikev2-policy)#group 14
+R2(config-ikev2-policy)#prf sha256
+R2(config-ikev2-policy)#lifetime 86400
+R2(config-ikev2-policy)#exit
+
+R2(config)#crypto ikev2 profile CLIENT_PROFILE
+R2(config-ikev2-profile)#match identity remote any
+R2(config-ikev2-profile)#authentication local pre-share
+R2(config-ikev2-profile)#authentication remote pre-share
+R2(config-ikev2-profile)#keyring local CLIENT_KEY
+R2(config-ikev2-profile)#exit
+
+R2(config)#crypto ipsec transform-set VPN_TRANS esp-aes 256 esp-sha256
+R2(cfg-crypto-trans)#mode tunnel
+R2(cfg-crypto-trans)#exit
+
+R2(config)#crypto ipsec profile CLIENT_IPSEC_PROFILE
+R2(config-ipsec-profile)#set transform-set VPN_TRANS
+R2(config-ipsec-profile)#set ikev2-profile CLIENT_PROFILE
+R2(config-ipsec-profile)#exit
+
+R2(config)#interface Virtual-Template1 type tunnel
+R2(config-if)#ip unnumbered gi0/0
+R2(config-if)#tunnel mode ipsec ipv4
+R2(config-if)#tunnel protection ipsec profile CLIENT_IPSEC_PROFILE
+R2(config-if)#exit
+
+R2(config)#ip access-list extended VPN_ACL
+R2(config-ext-nacl)#permit ip 192.168.30.0 0.0.0.63 192.168.20.0 0.0.0.255     ! clients to R2 LAN
+R2(config-ext-nacl)#permit ip 192.168.30.0 0.0.0.63 192.168.10.0 0.0.0.255     ! clients to R1 LAN
+R2(config-ext-nacl)#exit
+
+R2(config)#crypto dynamic-map CLIENT_MAP 10
+R2(config-crypto-dmap)#set transform-set VPN_TRANS
+R2(config-crypto-dmap)#match address VPN_ACL
+R2(config-crypto-dmap)#reverse-route
+R2(config-crypto-dmap)#exit
+
+R2(config)#crypto map CLIENT_CRYPTO 20 ipsec-isakmp dynamic CLIENT_MAP
+R2(config)#interface gi0/0
+R2(config-if)#crypto map CLIENT_CRYPTO
+R2(config-if)#exit

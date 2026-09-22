@@ -1,0 +1,79 @@
+R2(config)#!! SITE-TO-SITE PHASE 1
+R2(config)#crypto isakmp policy 10
+R2(config-isakmp)#encr aes 256
+R2(config-isakmp)#hash sha256
+R2(config-isakmp)#authentication pre-share
+R2(config-isakmp)#group 14
+R2(config-isakmp)#lifetime 86400
+R2(config-isakmp)#exit
+
+R2(config)#!! SITE-TO-SITE PHASE 2
+R2(config)#crypto isakmp key pass123 address 17.15.20.10   ! peer for site-to-site
+R2(config)#crypto ipsec transform-set Sec esp-aes 256 esp-sha256
+R2(cfg-crypto-trans)#mode tunnel
+R2(cfg-crypto-trans)#exit
+R2(config)#ip access-list extended Site2Site
+R2(config-ext-nacl)#permit ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+R2(config-ext-nacl)#exit
+
+R2(config)#!! SITE-TO-SITE PHASE 3
+R2(config)#crypto map Site2Site 10 ipsec-isakmp
+R2(config-crypto-map)#set peer 17.15.20.10
+R2(config-crypto-map)#set transform-set Sec
+R2(config-crypto-map)#match address Site2Site
+R2(config-crypto-map)#exit
+R2(config)#interface gi0/0
+R2(config-if)#crypto map Site2Site
+R2(config-if)#exit
+
+R1(config)#!! CLIENT VPN CONFIG
+R1(config)# !! CLIENT VPN - IKEv1
+R1(config)# 
+R1(config)# !! PHASE 1
+R1(config)# crypto isakmp policy 5
+R1(config-isakmp)# encr aes 256
+R1(config-isakmp)# hash sha
+R1(config-isakmp)# authentication pre-share
+R1(config-isakmp)# group 2
+R1(config-isakmp)# lifetime 86400
+R1(config-isakmp)# exit
+R1(config)# 
+R1(config)# ip local pool ClientVpnPool 192.168.30.1 192.168.30.40
+R1(config)# username RemoteUsers secret ClientP@ss123
+
+R1(config)# crypto isakmp client configuration group Client_Group
+R1(config-isakmp-group)# key ClientP@ss123
+R1(config-isakmp-group)# pool ClientVpnPool
+R1(config-isakmp-group)# acl Client2Site
+R1(config-isakmp-group)# exit
+R1(config)# 
+
+R1(config)# crypto isakmp profile Client_Group
+R1(conf-isa-prof)# match identity group Client_Group
+R1(conf-isa-prof)# client authentication list pre-share
+R1(conf-isa-prof)# isakmp authorization list Client2Site
+R1(conf-isa-prof)# exit
+R1(config)# 
+
+R1(config)# !! PHASE 2
+R1(config)# ip access-list extended Client2Site
+R1(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.63 192.168.10.0 0.0.0.255
+R1(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.63 192.168.30.0 0.0.0.255
+R1(config-ext-nacl)# exit
+R1(config)# 
+R1(config)# crypto ipsec transform-set Sec esp-aes 256 esp-sha-hmac
+R1(cfg-crypto-trans)# mode tunnel
+R1(cfg-crypto-trans)# exit
+R1(config)# 
+
+R1(config)# !! PHASE 3
+R1(config)# crypto dynamic-map ClientGroup 10
+R1(cfg-crypto-map)# set transform-set Sec
+R1(cfg-crypto-map)# set isakmp-profile Client_Group
+R1(cfg-crypto-map)# exit
+R1(config)# 
+R1(config)# crypto map Client2Site 10 ipsec-isakmp dynamic ClientGroup
+R1(config)# 
+R1(config)# int gi0/2
+R1(config-if)# crypto map Client2Site
+

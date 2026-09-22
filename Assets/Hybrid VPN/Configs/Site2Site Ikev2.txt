@@ -1,0 +1,54 @@
+R2(config)#!! SITE-TO-SITE VPN – IKEv2
+
+! --- Keyring for peer ---
+R2(config)#crypto ikev2 keyring SITE2SITE_KEY
+R2(config-ikev2-keyring)#peer R1
+R2(config-ikev2-keyring-peer)#address 17.15.20.10
+R2(config-ikev2-keyring-peer)#pre-shared-key pass123
+R2(config-ikev2-keyring-peer)#exit
+R2(config-ikev2-keyring)#exit
+
+! --- IKEv2 Policy ---
+R2(config)#crypto ikev2 policy SITE2SITE_POLICY
+R2(config-ikev2-policy)#encryption aes-256
+R2(config-ikev2-policy)#integrity sha256
+R2(config-ikev2-policy)#group 14
+R2(config-ikev2-policy)#prf sha256
+R2(config-ikev2-policy)#lifetime 86400
+R2(config-ikev2-policy)#exit
+
+! --- IKEv2 Profile ---
+R2(config)#crypto ikev2 profile SITE2SITE_PROFILE
+R2(config-ikev2-profile)#match identity remote address 17.15.20.10 255.255.255.255
+R2(config-ikev2-profile)#authentication remote pre-share
+R2(config-ikev2-profile)#authentication local pre-share
+R2(config-ikev2-profile)#keyring local SITE2SITE_KEY
+R2(config-ikev2-profile)#exit
+
+! --- IPsec Transform Set and Profile ---
+R2(config)#crypto ipsec transform-set SITE2SITE_TRANS esp-aes 256 esp-sha256
+R2(cfg-crypto-trans)#mode tunnel
+R2(cfg-crypto-trans)#exit
+
+R2(config)#crypto ipsec profile SITE2SITE_IPSEC_PROFILE
+R2(config-ipsec-profile)#set transform-set SITE2SITE_TRANS
+R2(config-ipsec-profile)#set ikev2-profile SITE2SITE_PROFILE
+R2(config-ipsec-profile)#exit
+
+! --- Access List for Traffic ---
+R2(config)#ip access-list extended SITE2SITE_ACL
+R2(config-ext-nacl)#permit ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+R2(config-ext-nacl)#exit
+
+! --- Crypto Map ---
+R2(config)#crypto map SITE2SITE_MAP 10 ipsec-isakmp
+R2(config-crypto-map)#set peer 17.15.20.10
+R2(config-crypto-map)#set transform-set SITE2SITE_TRANS
+R2(config-crypto-map)#set security-association ikev2-profile SITE2SITE_PROFILE
+R2(config-crypto-map)#match address SITE2SITE_ACL
+R2(config-crypto-map)#exit
+
+! --- Apply Crypto Map to Interface ---
+R2(config)#interface gi0/0
+R2(config-if)#crypto map SITE2SITE_MAP
+R2(config-if)#exit

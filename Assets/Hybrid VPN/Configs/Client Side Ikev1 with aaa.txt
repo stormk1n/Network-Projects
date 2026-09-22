@@ -1,0 +1,72 @@
+Router# configure terminal
+Enter configuration commands, one per line. End with CNTL/Z.
+
+Router(config)# ! --- PART 1: AAA and IP Management ---
+
+Router(config)# aaa new-model
+
+Router(config)# username YOUR_USERNAME password YOUR_PASSWORD
+
+Router(config)# aaa authentication login VPN_AUTH_LIST local
+
+Router(config)# aaa authorization network VPN_AUTHZ_LIST local
+
+Router(config)# ip local pool IP_POOL_NAME 192.168.50.1 192.168.50.100 mask 255.255.255.0
+
+Router(config)# ip access-list extended VPN_ACL_NAME
+Router(config-ext-nacl)# permit ip 192.168.50.0 0.0.0.255 192.168.10.0 0.0.0.255
+Router(config-ext-nacl)# exit
+
+Router(config)# ! --- PART 2: IKE Phase 1 Configuration ---
+
+Router(config)# crypto isakmp policy 20
+Router(config-isakmp)# encr aes 256
+Router(config-isakmp)# hash sha256
+Router(config-isakmp)# authentication pre-share
+Router(config-isakmp)# group 14
+Router(config-isakmp)# exit
+
+Router(config)# crypto isakmp profile IKE_PROFILE_NAME
+Router(config-isakmp-profile)# match identity group VPN_GROUP
+Router(config-isakmp-profile)# client authentication list VPN_AUTH_LIST
+Router(config-isakmp-profile)# isakmp authorization list VPN_AUTHZ_LIST
+Router(config-isakmp-profile)# client configuration address respond
+Router(config-isakmp-profile)# virtual-template 1
+Router(config-isakmp-profile)# exit
+
+Router(config)# ! --- PART 3: IKE Phase 2 Configuration (IPsec) ---
+
+Router(config)# crypto ipsec transform-set TRANSFORM_SET_NAME esp-aes 256 esp-sha256-hmac
+Router(config-transform)# mode tunnel
+Router(config-transform)# exit
+
+Router(config)# crypto ipsec profile IPSEC_PROFILE_NAME
+Router(config-ipsec-profile)# set transform-set TRANSFORM_SET_NAME
+Router(config-ipsec-profile)# set isakmp-profile IKE_PROFILE_NAME
+Router(config-ipsec-profile)# exit
+
+Router(config)# ! --- PART 4: Dynamic Tunnel and Interface Application ---
+
+Router(config)# interface Virtual-Template 1 type tunnel
+Router(config-if)# ip unnumbered GigabitEthernet0/0
+Router(config-if)# tunnel mode ipsec ipv4
+Router(config-if)# tunnel protection ipsec profile IPSEC_PROFILE_NAME
+Router(config-if)# exit
+
+Router(config)# crypto dynamic-map DYNAMIC_MAP_NAME 10
+Router(config-crypto-dyn-map)# set transform-set TRANSFORM_SET_NAME
+Router(config-crypto-dyn-map)# match address VPN_ACL_NAME
+Router(config-crypto-dyn-map)# exit
+
+Router(config)# crypto map MAIN_CRYPTO_MAP_NAME 20 ipsec-isakmp dynamic DYNAMIC_MAP_NAME
+
+Router(config)# interface Gi0/0
+Router(config-if)# crypto map MAIN_CRYPTO_MAP_NAME
+Router(config-if)# exit
+
+Router(config)# ! --- END OF CONFIGURATION ---
+
+Router(config)# end
+Router# write memory
+
+https://www.youtube.com/watch?v=I6tbLOJTqTQ

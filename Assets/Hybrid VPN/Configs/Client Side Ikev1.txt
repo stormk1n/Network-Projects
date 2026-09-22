@@ -1,0 +1,97 @@
+R2(config)#!! CLIENT VPN - IKEv1
+R2(config)#
+R2(config)#!! PHASE 1: IKEv1 & CLIENT IDENTITY
+R2(config)# aaa new-model
+R2(config)# aaa authentication login Client_Auth_Log local
+R2(config)# aaa authorization network Client_Auth_Net local
+R2(config)#
+R2(config)# username RemoteUsers secret ClientP@ss123
+R2(config)#
+R2(config)# crypto isakmp policy 5
+R2(config-isakmp)# encr aes 256
+R2(config-isakmp)# hash sha
+R2(config-isakmp)# authentication pre-share
+R2(config-isakmp)# group 2
+R2(config-isakmp)# lifetime 86400
+R2(config-isakmp)# exit
+R2(config)#
+R2(config)# ip local pool ClientVpnPool 192.168.30.10 192.168.30.50
+R2(config)#
+R2(config)# crypto isakmp client configuration group Client_Config
+R2(config-isakmp-group)# key ClientP@ss123
+R2(config-isakmp-group)# pool ClientVpnPool
+R2(config-isakmp-group)# acl ClientVpn_Acc
+R2(config-isakmp-group)# exit
+R2(config)#
+R2(config)# client configuration group RemoteUsers
+ address-pool ClientVpnPool
+R2(config)#
+R2(config)#
+R2(config)# crypto isakmp key ClientP@ss123 address 0.0.0.0 0.0.0.0
+R2(config)# crypto keyring Client_Keyring
+R2(config-keyring)# pre-shared-key hostname Client_Config key ClientP@ss123
+R2(config-keyring)# exit
+R2(config)#
+R2(config)# crypto isakmp profile Client_Profile
+R2(config-isa-prof)# match identity group Client_Config
+R2(config-isa-prof)# client configuration address respond
+R2(config-isa-prof)# client authentication list Client_Auth_Log
+R2(config-isa-prof)# isakmp authorization list Client_Auth_Net
+R2(config-isa-prof)# virtual-template 1
+R2(config-isa-prof)# keyring Client_Keyring
+R2(config-isa-prof)# exit
+R2(config)#
+R2(config)#
+R2(config)#
+R2(config)#!! PHASE 2: IPSEC & TRAFFIC RULES
+R2(config)# ip access-list extended ClientVpn_Acc
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.40.0 0.0.0.255
+R2(config-ext-nacl)# permit ip 192.168.30.0 0.0.0.255 192.168.50.0 0.0.0.255
+R2(config-ext-nacl)# exit
+R2(config)#
+R2(config)# crypto ipsec transform-set TS_Client esp-aes 256 esp-sha-hmac
+R2(config-crypto-trans)# mode tunnel
+R2(config-crypto-trans)# exit
+R2(config-if)# exit
+R2(config)#
+R2(config)#
+R2(config)#!! PHASE 3: MAPS & INTERFACE BINDING
+R2(config)# interface Virtual-Template1
+R2(config-if)# ip unnumbered GigabitEthernet0/2
+R2(config-if)# peer default ip address pool ClientVpnPool
+R2(config-if)# ppp encrypt mppe auto
+R2(config-if)# ppp authentication ms-chap-v2
+R2(config-if)# exit
+R2(config)#
+R2(config)# vpdn enable
+R2(config)# vpdn-group RemoteUsers
+R2(config-vpdn)# accept-dialin
+R2(config-vpdn-acc-in)# protocol ipsec
+R2(config-vpdn-acc-in)# virtual-template 1
+R2(config)#
+R2(config)# crypto dynamic-map DM_Client 5
+R2(config-crypto-map)# set transform-set TS_Client
+R2(config-crypto-map)# set isakmp-profile Client_Profile
+R2(config-crypto-map)# reverse-route
+R2(config-crypto-map)# exit
+R2(config)#
+R2(config)#crypto isakmp client configuration address-pool local ClientVpnPool
+R2(config)#
+R2(config)# crypto map CM_Client 5 ipsec-isakmp dynamic DM_Client
+R2(config)# crypto map CM_Client client authentication list Client_Auth_Log
+R2(config)# crypto map CM_Client isakmp authorization list Client_Auth_Net
+R2(config)# crypto map CM_Client client configuration address respond
+R2(config)#
+R2(config)# interface GigabitEthernet0/2
+R2(config-if)# crypto map CM_Client
+R2(config-if)# exit
+R2(config)#
+R2(config)# !! crypto isakmp identity address
+R2(config)#
+R2(config)#!! MAINTENANCE
+R2(config)# do show crypto isakmp sa
+R2(config)# do clear crypto isakmp sa
+R2(config)# do clear crypto ipsec sa
+R2(config)#
+
+https://www.youtube.com/watch?v=I6tbLOJTqTQ

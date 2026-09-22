@@ -1,0 +1,47 @@
+R2(config)#!! PHASE 1
+R2(config)#crypto isakmp policy 10
+R2(config-isakmp)#
+R2(config-isakmp)#encr aes 256
+R2(config-isakmp)#
+R2(config-isakmp)#hash sha256
+R2(config-isakmp)#
+R2(config-isakmp)#authentication pre-share
+R2(config-isakmp)#
+R2(config-isakmp)#group 14
+R2(config-isakmp)#
+R2(config-isakmp)#lifetime 86400
+R2(config-isakmp)#exit
+R2(config)#
+R2(config)#
+R2(config)#
+R2(config)#!! PHASE 2
+R2(config)#
+R2(config)#crypto isakmp key pass123 address 17.15.20.10
+R2(config)#
+R2(config)#crypto ipsec transform-set Sec esp-aes 256 esp-sha256
+R2(cfg-crypto-trans)#mode tunnel
+R2(cfg-crypto-trans)#exit
+R2(config)#
+R2(config)#ip access-list extended Site2Site
+R2(config-ext-nacl)#permit ip 192.168.20.10 0.0.0.255 192.168.10.20 0.0.0.255
+R2(config-ext-nacl)#exit
+R2(config)#
+R2(config)#
+R2(config)#
+R2(config)#!! PHASE 3
+R2(config)#
+R2(config)#crypto map Site2Site 10 ipsec-isakmp
+% NOTE: This new crypto map will remain disabled until a peer
+and a valid access list have been configured.
+R2(config-crypto-map)#set peer 17.15.20.10
+R2(config-crypto-map)#set transform-set Sec
+R2(config-crypto-map)#match address Site2Site
+R2(config-crypto-map)#exit
+R2(config)#
+R2(config)#int gi0/0
+R2(config-if)#crypto map Site2Site
+R2(config-if)#
+*Aug 28 03:37:41.146: %CRYPTO-6-ISAKMP_ON_OFF: ISAKMP is ON
+R2(config-if)#
+*Aug 28 03:37:42.131: %LINEPROTO-5-UPDOWN: Line protocol on Interface NVIB, changed state to up
+R2(config-if)#

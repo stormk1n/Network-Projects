@@ -1,0 +1,44 @@
+192.168.50.50 - LINUX VM (VPN Client)
+$ sudo su
+# apt update
+# apt install strongswan -y
+
+# !! Step 1: Configure IPSec (IKEv1) 
+# Edit /etc/ipsec.conf
+# Here we create a configuration for connecting to R2
+$ nano /etc/ipsec.conf
+
+# Add the following inside the file:
+conn cisco-vpn
+    keyexchange=ikev1
+    authby=psk
+    left=%defaultroute
+    leftid=192.168.50.50        # Local VPN client IP
+    right=192.168.173.21        # R2 public IP
+    rightid=17.15.20.10         # Cisco VPN ID (site-to-site peer ID)
+    ike=aes256-sha256-modp14
+    esp=aes256-sha256
+    auto=start
+
+# !! Step 2: Set pre-shared key
+# Edit /etc/ipsec.secrets
+$ nano /etc/ipsec.secrets
+
+# Add the following line:
+192.168.173.21 : PSK "client123"
+
+# !! Step 3: Start the VPN client
+$ ipsec restart
+$ ipsec up cisco-vpn
+
+# !! Step 4: Verify VPN status
+$ ipsec statusall
+# You should see the tunnel established and encryption parameters.
+
+# !! Step 5: Test connectivity
+$ ping 192.168.10.20       # Remote LAN behind R2
+$ ping 192.168.50.10       # VPN-assigned IP from pool
+
+# !! Step 6: Optional - check IP routes for VPN
+$ ip route show
+# Confirm that traffic to remote LAN (192.168.10.0/24) routes through the VPN

@@ -1,0 +1,56 @@
+aaa new-model
+
+aaa authentication login RemoteUsers local
+
+aaa authorization network groupauth local
+
+username RemoteUsers secret pass
+
+
+! PHASE 1
+crypto isakmp policy 1
+>encr 3des
+>auth pre-share
+>group 2
+
+
+crypto isakmp client config group C2S
+>key key
+>dns dns_IP
+>domain domain_name
+>pool pool_name
+>acl acl_name
+
+
+! PHASE 2
+crypto IPsec transform-set ts_name esp-3des esp-md5-hmac
+exit
+
+crypto dynamic-map dynmap_name 10
+>set transform set ts_name
+>reverse-route
+exit
+
+crypto map map_name authentication list RemoteUsers
+
+crypto map map_name isakmp authorization list groupauth
+
+crypto map map_name client config address respond
+
+crypto map clientmap 10 ipsec-isakmp dynamic dynmap_name
+
+int gi0/2
+
+crypto map map_name 
+
+
+
+ip local pool pool_name ip_sart ip_end
+
+access-list 102 permit ip LAN_IP LAN_WILDCARD Remote_IP=(ip in local pool) Remote_WildCard
+
+access list extended 101 (nat access-list)
+>deny ip LAN_IP LAN_WILDCARD Remote_IP Remote_WildCard
+
+
+

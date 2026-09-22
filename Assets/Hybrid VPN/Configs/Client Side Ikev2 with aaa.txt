@@ -1,0 +1,73 @@
+Router# configure terminal
+Enter configuration commands, one per line. End with CNTL/Z.
+
+Router(config)# ! --- PART 1: AAA, IP Management, and Authorization Policy ---
+
+Router(config)# aaa new-model
+Router(config)# username YOUR_USERNAME password YOUR_PASSWORD
+
+Router(config)# aaa authentication login VPN_AUTH_LIST local
+Router(config)# aaa authorization network VPN_AUTHZ_LIST local
+
+Router(config)# ip local pool IP_POOL_NAME 192.168.50.1 192.168.50.100 mask 255.255.255.0
+
+Router(config)# ! IKEv2 uses an authorization policy to push attributes like the IP pool
+Router(config)# crypto ikev2 authorization policy IKEV2_AUTHOR_POLICY
+Router(config-ikev2-author-policy)# pool IP_POOL_NAME
+Router(config-ikev2-author-policy)# exit
+
+Router(config)# ! --- PART 2: IKEv2 Phase 1 (Proposal, Policy, Keyring) ---
+
+Router(config)# crypto ikev2 proposal IKEV2_PROPOSAL
+Router(config-ikev2-proposal)# encryption aes-cbc-256
+Router(config-ikev2-proposal)# integrity sha256
+Router(config-ikev2-proposal)# group 14
+Router(config-ikev2-proposal)# exit
+
+Router(config)# crypto ikev2 policy IKEV2_POLICY
+Router(config-ikev2-policy)# proposal IKEV2_PROPOSAL
+Router(config-ikev2-policy)# exit
+
+Router(config)# crypto ikev2 keyring IKEV2_KEYRING
+Router(config-ikev2-keyring)# peer ANY_CLIENT
+Router(config-ikev2-keyring-peer)# address 0.0.0.0 0.0.0.0
+Router(config-ikev2-keyring-peer)# pre-shared-key YOUR_SHARED_SECRET
+Router(config-ikev2-keyring-peer)# exit
+Router(config-ikev2-keyring)# exit
+
+Router(config)# ! --- PART 3: IKEv2 Profile ---
+
+Router(config)# crypto ikev2 profile IKEV2_PROFILE
+Router(config-ikev2-profile)# match identity remote any
+Router(config-ikev2-profile)# authentication remote pre-share
+Router(config-ikev2-profile)# authentication local pre-share
+Router(config-ikev2-profile)# keyring local IKEV2_KEYRING
+Router(config-ikev2-profile)# aaa authentication login VPN_AUTH_LIST
+Router(config-ikev2-profile)# aaa authorization group psk list VPN_AUTHZ_LIST IKEV2_AUTHOR_POLICY
+Router(config-ikev2-profile)# virtual-template 1
+Router(config-ikev2-profile)# exit
+
+Router(config)# ! --- PART 4: IPsec and Virtual Interface ---
+
+Router(config)# crypto ipsec transform-set TRANSFORM_SET_NAME esp-aes 256 esp-sha256-hmac
+Router(config-transform)# mode tunnel
+Router(config-transform)# exit
+
+Router(config)# crypto ipsec profile IPSEC_PROFILE_NAME
+Router(config-ipsec-profile)# set transform-set TRANSFORM_SET_NAME
+Router(config-ipsec-profile)# set ikev2-profile IKEV2_PROFILE
+Router(config-ipsec-profile)# exit
+
+Router(config)# interface Virtual-Template 1 type tunnel
+Router(config-if)# ip unnumbered GigabitEthernet0/0
+Router(config-if)# tunnel mode ipsec ipv4
+Router(config-if)# tunnel protection ipsec profile IPSEC_PROFILE_NAME
+Router(config-if)# exit
+
+Router(config)# ! IKEv2 typically uses VTIs; applying to the physical interface Gi0/0
+Router(config)# interface Gi0/0
+Router(config-if)# description OUTSIDE_INTERFACE
+Router(config-if)# exit
+
+Router(config)# end
+Router# write memory
