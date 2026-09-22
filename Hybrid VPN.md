@@ -179,7 +179,7 @@ R2(config)# int gi0/2
 R2(config-if)# crypto map Client2Site
 ```
 
-Final ACL file <br>
+Final ACL configuration <br>
 <img src='./Assets/Hybrid%20VPN/ACL.png' alt="Final ACL">
 <br>
 
