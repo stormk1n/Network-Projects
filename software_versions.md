@@ -1,6 +1,6 @@
-https://github.com/GNS3/gns3-server/blob/master/gns3server/appliances/cisco-iosvl2.gns3a
+Switch: https://github.com/GNS3/gns3-server/blob/master/gns3server/appliances/cisco-iosvl2.gns3a
 
-https://github.com/GNS3/gns3-server/blob/master/gns3server/appliances/cisco-iosv.gns3a
+Router: https://github.com/GNS3/gns3-server/blob/master/gns3server/appliances/cisco-iosv.gns3a
 
 Cisco VPN Client 5.0.7: https://www.superpit.com.au/vpn-software/vpnclient-winx64-msi-5-0-07-0290-k9/
 
