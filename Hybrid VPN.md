@@ -37,6 +37,7 @@ A hybrid vpn model (both C2S and S2S in one) using IPSec protocol (openvpn is an
 
 ## Configuration Phases
 Before we begin, heres what the final topology should look like
+- Please see [note](#helpful-note) before anything else
 
 <img src='./Assets/Hybrid VPN/Topology Overview.png' alt='Hybrid VPN Topology'>
 
@@ -248,7 +249,11 @@ With results from both captures showing as ESPs, it confirms our VPN is up and r
 <br>
 
 
-**Note**<br>There's a whole lot put in this network, we only focused on the VPN configuration, but this network had;
+## Helpful Note
+
+<br>
+
+There's a whole lot put in this network, we only focused on the VPN configuration, but this network had;
 1) IP subnetting (which is seeing above)
 2) Vlan creation
 3) Routing protocols
