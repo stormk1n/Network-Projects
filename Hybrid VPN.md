@@ -235,12 +235,15 @@ With results from both captures showing as ESPs, it confirms our VPN is up and r
 <br>
 
 # Troubleshooting Tips
-1) GNS3 had a tendency of shoting down our vmnet interface, which caused a lot of trouble in verifying our clients connectivity.
+1) GNS3 had a tendency of shoting down the vmnet interfaces, which caused a lot of trouble in verifying our remote clients connectivity.
 
-2) The commands are straineous and one miss-typed input could lead to troubleshooting for days, which was caused by a simple typo
+2) The commands are strenuous and one miss-typed input could lead to troubleshooting for days, caused by a simple typo
 
-3) Verify the ACL, for some reason, standard ACL worked best for C2S while extended worked great for S2S, (had to learn that the hard way)
+3) Verify the ACL: for some reason, standard ACL worked best for C2S while extended worked great for S2S, (had to learn that the hard way)
 
+<br>
+
+feat: Complete walkthrough for hybrid vpn setup
 
 **Note**<br>There's a whole lot put in this network, we only focused on the VPN configuration, but this network had;
 1) IP subnetting (which is seeing above)
