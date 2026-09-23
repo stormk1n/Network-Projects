@@ -202,7 +202,9 @@ Should return <br>
 <img src='./Assets/Hybrid VPN/Isakmp SA.png' alt='Phase1 and phase2 results'>
 <br>Our security association (SA) shows up as active.
 
-**Note:**<br>We can't verify phase3 since it isn't a standard phase, so all we do next is to ping and capture traffic of a ping request and study how it goes
+**Note:**<br>
+- We can't verify phase3 since it isn't a standard phase, so all we do next is to ping and capture traffic of a ping request and study how it goes
+- Taking out the clouds nodes so wireshark doesn't capture traffic from our local network (caused the GNS3 app to crash out in my case and lead to vmnets shutting down after each crash)
 <br>
 <br>
 
