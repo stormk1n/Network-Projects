@@ -243,7 +243,6 @@ With results from both captures showing as ESPs, it confirms our VPN is up and r
 
 <br>
 
-feat: Complete walkthrough for hybrid vpn setup
 
 **Note**<br>There's a whole lot put in this network, we only focused on the VPN configuration, but this network had;
 1) IP subnetting (which is seeing above)
