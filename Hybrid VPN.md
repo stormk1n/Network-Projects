@@ -55,14 +55,16 @@ Before we begin, heres what the final topology should look like
 
 </details>
 
-**Note:** <br>The portable file ([Hybrid_VPN_Portable_File](./Portable%20Projects/Hybrid_VPN_Portable_File.gns3project)) doesn't come with the servers or remote client, as those vms are too large to upload
+**Note:**
+- The portable file ([Hybrid_VPN_Portable_File](./Portable%20Projects/Hybrid_VPN_Portable_File.gns3project)) doesn't come with the servers or remote client, as those vms are too large to upload
 <br>
 <br>
 
 ## Getting started
 Now then, both C2S and S2S have been configured in 3 phases in this walkthrough
 
-**Note** <br> Due to router constraints, we are going to use IKEv1 and ISAKMP v1, but configurations for v2 can be found in the [Configs folder](./Assets/Hybrid%20VPN/Configs/)
+**Note**
+- Due to router constraints, we are going to use IKEv1 and ISAKMP v1, but configurations for v2 can be found in the [Configs folder](./Assets/Hybrid%20VPN/Configs/)
 
 
 ## Phase 1
@@ -237,7 +239,7 @@ With results from both captures showing as ESPs, it confirms our VPN is up and r
 <br>
 
 # Troubleshooting Tips
-1) GNS3 had a tendency of shoting down the vmnet interfaces, which caused a lot of trouble in verifying our remote clients connectivity.
+1) GNS3 had a tendency of shutting down the vmnet interfaces, which caused a lot of trouble in verifying our remote clients connectivity.
 
 2) The commands are strenuous and one miss-typed input could lead to troubleshooting for days, caused by a simple typo
 
