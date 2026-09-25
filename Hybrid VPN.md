@@ -263,6 +263,6 @@ There's a whole lot put in this network, we only focused on the VPN configuratio
 6) ACL configuration (mentioned but not gone deep into)
 7) AD-DS
 8)  DNS (forward and reverse lookup zones)
-9) Setting up nginx (custom made [lahfen-autos](https://github.com/stormk1n/Lahfen-Autos))
+9) Setting up nginx with custom made [lahfen-autos](https://github.com/stormk1n/Lahfen-Autos) web app
 10) Configuring UFW on the ubuntu server
 11) And finally our VPN which is a 2 in 1 setup
