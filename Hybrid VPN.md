@@ -30,7 +30,7 @@ A hybrid vpn model (both C2S and S2S in one) using IPSec protocol (openvpn is an
 5) Basic usage of gns3 ([Once again, David Bombal Getting started with gns3](https://youtu.be/Ibe3hgP8gCA?list=PLhfrWIlLOoKNFP_e5xcx5e2GDJIgk3ep6))
 6) VMs (used windows server 22, ubuntu and win7)
 7) Cisco vpn client 5.0.07 which doesn't cost us and is compactible with win7 ([Download](https://www.superpit.com.au/vpn-software/vpnclient-winx64-msi-5-0-07-0290-k9/))
-8) Hypervisor of choice
+8) Hypervisor of choice (used vmware workstation 25H2)
 
 <br>
 <br>
