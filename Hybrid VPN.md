@@ -259,7 +259,7 @@ There's a whole lot put in this network, we only focused on the VPN configuratio
 2) Vlan creation
 3) Routing protocols
 4) Intervlan routing (router on a stick)
-5) DHCP to automatically assign IP (configured on the router, not on the windows server)
+5) DHCP to automatically assign IP addresses (configured on the router, not on the windows server)
 6) ACL configuration (mentioned but not gone deep into)
 7) AD-DS
 8)  DNS (forward and reverse lookup zones)
