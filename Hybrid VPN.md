@@ -23,7 +23,7 @@ A hybrid vpn model (both C2S and S2S in one) using IPSec protocol (openvpn is an
 
 
 ## Tools Required
-1) [David Bombal Getting started with gns3](https://youtu.be/Ibe3hgP8gCA?list=PLhfrWIlLOoKNFP_e5xcx5e2GDJIgk3ep6)
+1) [David Bombal Getting started with gns3](https://youtu.be/Ibe3hgP8gCA?list=PLhfrWIlLOoKNFP_e5xcx5e2GDJIgk3ep6) (not everything, just enough to get a hang of things)
 2) Gns3 (comes with wireshark, also needed in case it wasn't installed) [GNS3 Download](https://www.gns3.com/software/download)
 3) Gns3 vm [GNS3VM Download](https://www.gns3.com/software/download-vm)
 4) Available appliance files: [Router](https://github.com/GNS3/gns3-server/blob/master/gns3server/appliances/cisco-iosv.gns3a) and [switch](https://github.com/GNS3/gns3-server/blob/master/gns3server/appliances/cisco-iosvl2.gns3a) (Import the gns3 appliance files as templates or find a method that best suites you)
