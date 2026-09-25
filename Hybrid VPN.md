@@ -226,7 +226,10 @@ Before and after our client connects.
 We can confirm client access from
 
 <img src='./Assets/Hybrid VPN/Ip_local_Pool.png'>
-<br>which shows us the state of the local pool before and after our client connected
+which shows us the state of the local pool before and after our client connected
+
+<br>
+<br>
 
 2) Once again, we analyze our traffic with wireshark to make sure we safe
 
@@ -244,7 +247,7 @@ With results from both captures showing as ESPs, it confirms our VPN is up and r
 
 2) The commands are strenuous and one miss-typed input could lead to troubleshooting for days, caused by a simple typo
 
-3) Verify the ACL: for some reason, standard ACL worked best for C2S while extended worked great for S2S, (had to learn that the hard way)
+3) Verify the ACL, standard ACL worked best for C2S while extended worked great for S2S, (had to learn that the hard way)
 
 <br>
 
@@ -260,6 +263,6 @@ There's a whole lot put in this network, we only focused on the VPN configuratio
 6) ACL configuration (mentioned but not gone deep into)
 7) AD-DS
 8)  DNS (forward and reverse lookup zones)
-9) Hosting a web site using nginx (custom made [lahfen-autos](https://github.com/stormk1n/Lahfen-Autos))
+9) Setting up nginx (custom made [lahfen-autos](https://github.com/stormk1n/Lahfen-Autos))
 10) Configuring UFW on the ubuntu server
-11) And finally our VPN which is a 2 in 1 setup (so there should be 12)
+11) And finally our VPN which is a 2 in 1 setup
