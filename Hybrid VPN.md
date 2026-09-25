@@ -265,4 +265,4 @@ There's a whole lot put in this network, we only focused on the VPN configuratio
 8)  DNS (forward and reverse lookup zones)
 9) Setting up nginx with custom made [lahfen-autos](https://github.com/stormk1n/Lahfen-Autos) web app
 10) Configuring UFW on the ubuntu server
-11) And finally our VPN which is a 2 in 1 setup
+11) And finally, our VPN, which is a two-in-one setup
